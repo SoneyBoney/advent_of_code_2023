@@ -1,0 +1,53 @@
+import itertools as it
+
+
+def extract_number(matrix, tagged_indices, seen_indices, row, col):
+    ret = matrix[row][col]
+
+    i = col - 1
+    while i > 0:
+        if matrix[row][i].isdigit():
+            if (row,i) in seen_indices: return 0
+            ret = matrix[row][i] + ret
+            seen_indices.add((row,i))
+            i -= 1
+        else:
+            break
+    i = col + 1
+    while i < len(matrix[row]):
+        if matrix[row].isdigit():
+            if (row,i) in seen_indices: return 0
+            ret += matrix[row][i]
+            seen_indices.add((row,i))
+            i += 1
+        else:
+            break
+    return int(ret)
+
+
+def sol(a):
+    tagged_indices = set()
+    for row in range(len(a)):
+        for col in range(len(a[row])):
+            if a[row][col] != '.' and (not a[row][col].isdigit()):
+                for offset in it.product((0,1,-1),(0,1,-1)):
+                    if offset == (0,0): continue
+                    try:
+                        if a[row+offset[0]][col+offset[1]].isdigit():
+                            tagged_indices.add((row+offset[0],col+offset[1]))
+                    except IndexError:
+                        continue
+    print(tagged_indices)
+    seen_indices = set()
+    ret = [extract_number(a, tagged_indices, seen_indices,  x[0], x[1]) for x in tagged_indices]
+    return ret
+
+
+
+
+
+with open('test.txt') as f:
+    temp = f.read().split('\n')[:-1]
+
+    ret = sol(temp)
+    print(sum(ret))
